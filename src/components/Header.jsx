@@ -25,7 +25,7 @@ export default function Header({ view, setView, onReset }) {
 
       <div style={styles.right}>
         <div style={styles.dot} />
-        <span style={styles.status}>Engine Running</span>
+        <span style={styles.status}>Agent Active</span>
         <button onClick={onReset} style={styles.resetBtn} title="Change API key">
           🔑
         </button>

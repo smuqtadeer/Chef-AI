@@ -1,29 +1,19 @@
 import { useState, useRef, useEffect } from 'react'
-
-const SYSTEM_PROMPT = `You are AutoBot, a passionate and knowledgeable car expert chatbot. You know everything about:
-- All car brands, models, trims, and years (domestic and international)
-- Performance specs: horsepower, torque, 0-60 times, top speeds
-- Car buying advice, pricing, and negotiation tips
-- Maintenance schedules, DIY repairs, and mechanical explanations
-- Electric vehicles, hybrids, and emerging automotive tech
-- Motorsport: F1, NASCAR, WRC, drag racing, drifting
-- Car culture, modifications, and tuning
-- Comparisons between vehicles and personalized recommendations
-
-Your tone is enthusiastic, direct, and a little like a gearhead friend who knows their stuff. Use car lingo naturally. Keep answers clear and helpful. When recommending cars, always consider the user's budget and needs if mentioned. Never be boring — cars are exciting!`
+import { runAgent } from '../agent/runAgent.js'
+import { TOOL_LABELS, formatToolInput, formatToolResultSummary } from '../agent/tools/index.js'
 
 const CHIPS = [
   'Best sports cars under $50k?',
+  'Compare Civic vs Corolla',
   'EV vs gas — which is better?',
-  'How do I maintain my car?',
+  'What maintenance at 30k miles?',
   "What's the fastest production car?",
-  'Best cars for beginners?',
-  'Explain turbochargers',
+  'Calculate payment on a $35k car',
 ]
 
 const WELCOME = {
   role: 'bot',
-  text: 'Welcome to <strong>AutoBot</strong> — your personal car expert! 🚗💨<br><br>Ask me anything: buying advice, specs, maintenance tips, car comparisons, motorsport, EV tech, or just which car matches your vibe. I live and breathe cars. Let\'s ride.',
+  text: 'Welcome to <strong>AutoBot</strong> — your AI car expert agent! 🚗💨<br><br>I\'m not just a chatbot — I\'m an <strong>agent</strong> with real tools. I can search the web, fetch pages, compare vehicles, calculate payments, and check maintenance schedules.<br><br>Ask me anything about cars. Let\'s ride.',
 }
 
 export default function ChatView({ apiKey }) {
@@ -52,6 +42,23 @@ export default function ChatView({ apiKey }) {
     }
   }
 
+  function addToolCall({ id, name, input: toolInput }) {
+    setMessages(prev => [
+      ...prev,
+      { role: 'tool', id, name, input: toolInput, status: 'running' },
+    ])
+  }
+
+  function completeToolCall({ id, name, input: toolInput, result }) {
+    setMessages(prev =>
+      prev.map(msg =>
+        msg.role === 'tool' && msg.id === id
+          ? { ...msg, name, input: toolInput, result, status: 'done' }
+          : msg
+      )
+    )
+  }
+
   async function sendMessage(text) {
     const trimmed = text.trim()
     if (!trimmed || loading) return
@@ -65,30 +72,17 @@ export default function ChatView({ apiKey }) {
     setLoading(true)
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1024,
-          system: SYSTEM_PROMPT,
-          messages: newHistory,
-        }),
+      const reply = await runAgent(apiKey, newHistory, {
+        onToolStart: addToolCall,
+        onToolComplete: completeToolCall,
       })
 
-      const data = await res.json()
-      const reply = data.content?.[0]?.text || "Hmm, I stalled out there. Try again!"
       setHistory(prev => [...prev, { role: 'assistant', content: reply }])
       setMessages(prev => [...prev, { role: 'bot', text: reply }])
-    } catch {
+    } catch (err) {
       setMessages(prev => [
         ...prev,
-        { role: 'bot', text: '⚠️ Engine trouble — couldn\'t connect to the API. Check your connection and try again.' },
+        { role: 'bot', text: `⚠️ Engine trouble — ${err.message}` },
       ])
     }
 
@@ -97,7 +91,6 @@ export default function ChatView({ apiKey }) {
 
   return (
     <div style={styles.container}>
-      {/* Chips */}
       <div style={styles.chips}>
         {CHIPS.map(chip => (
           <button key={chip} style={styles.chip} onClick={() => sendMessage(chip)}>
@@ -106,16 +99,14 @@ export default function ChatView({ apiKey }) {
         ))}
       </div>
 
-      {/* Messages */}
       <div style={styles.messages}>
         {messages.map((msg, i) => (
-          <Message key={i} msg={msg} />
+          <Message key={msg.id || i} msg={msg} />
         ))}
         {loading && <TypingIndicator />}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <div style={styles.inputArea}>
         <textarea
           ref={textareaRef}
@@ -144,6 +135,8 @@ export default function ChatView({ apiKey }) {
 }
 
 function Message({ msg }) {
+  if (msg.role === 'tool') return <ToolCallMessage msg={msg} />
+
   const isBot = msg.role === 'bot'
   return (
     <div style={{ ...styles.message, ...(isBot ? {} : styles.messageUser) }}>
@@ -154,6 +147,46 @@ function Message({ msg }) {
         style={{ ...styles.bubble, ...(isBot ? styles.botBubble : styles.userBubble) }}
         dangerouslySetInnerHTML={{ __html: msg.text.replace(/\n/g, '<br>') }}
       />
+    </div>
+  )
+}
+
+function ToolCallMessage({ msg }) {
+  const [expanded, setExpanded] = useState(false)
+  const label = TOOL_LABELS[msg.name] || msg.name
+  const isRunning = msg.status === 'running'
+  const summary = msg.result ? formatToolResultSummary(msg.name, msg.result) : null
+
+  return (
+    <div style={styles.toolCall}>
+      <div style={styles.toolCallHeader}>
+        <span style={styles.toolCallIcon}>🔧</span>
+        <div style={styles.toolCallMeta}>
+          <span style={styles.toolCallName}>{label}</span>
+          <span style={styles.toolCallInput}>{formatToolInput(msg.name, msg.input)}</span>
+        </div>
+        <span style={{
+          ...styles.toolCallStatus,
+          ...(isRunning ? styles.toolCallRunning : styles.toolCallDone),
+        }}>
+          {isRunning ? 'Running…' : summary || 'Done'}
+        </span>
+      </div>
+
+      {!isRunning && msg.result && (
+        <button
+          onClick={() => setExpanded(e => !e)}
+          style={styles.toolCallToggle}
+        >
+          {expanded ? 'Hide result' : 'Show result'}
+        </button>
+      )}
+
+      {expanded && msg.result && (
+        <pre style={styles.toolCallResult}>
+          {JSON.stringify(msg.result, null, 2)}
+        </pre>
+      )}
     </div>
   )
 }
@@ -212,6 +245,53 @@ const styles = {
   userBubble: {
     background: 'var(--user-bg)', border: '1px solid #3a3a7c',
     borderTopRightRadius: 2, color: '#d0d0ff',
+  },
+  toolCall: {
+    alignSelf: 'center',
+    width: '100%',
+    maxWidth: 640,
+    background: '#111',
+    border: '1px solid var(--border)',
+    borderLeft: '3px solid var(--red)',
+    borderRadius: 8,
+    padding: '10px 14px',
+    animation: 'fadeUp .25s ease',
+  },
+  toolCallHeader: {
+    display: 'flex', alignItems: 'center', gap: 10,
+  },
+  toolCallIcon: { fontSize: 14, flexShrink: 0 },
+  toolCallMeta: { flex: 1, minWidth: 0 },
+  toolCallName: {
+    display: 'block', fontSize: 12, fontWeight: 600,
+    color: 'var(--white)', letterSpacing: 0.3,
+  },
+  toolCallInput: {
+    display: 'block', fontSize: 11, color: 'var(--gray)',
+    marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+  },
+  toolCallStatus: {
+    fontSize: 11, fontWeight: 500, flexShrink: 0,
+    padding: '3px 8px', borderRadius: 10,
+  },
+  toolCallRunning: {
+    color: '#fbbf24', background: 'rgba(251, 191, 36, 0.1)',
+  },
+  toolCallDone: {
+    color: '#86efac', background: 'rgba(34, 197, 94, 0.1)',
+  },
+  toolCallToggle: {
+    background: 'none', border: 'none', color: 'var(--gray)',
+    fontSize: 11, cursor: 'pointer', padding: '6px 0 0',
+    fontFamily: "'Inter', sans-serif",
+  },
+  toolCallResult: {
+    marginTop: 8, padding: '10px 12px',
+    background: '#0a0a0a', borderRadius: 6,
+    fontSize: 11, lineHeight: 1.5, color: '#aaa',
+    overflowX: 'auto', maxHeight: 200, overflowY: 'auto',
+    fontFamily: "'JetBrains Mono', monospace",
+    whiteSpace: 'pre-wrap', wordBreak: 'break-word',
   },
   typing: {
     display: 'flex', alignItems: 'center', gap: 5,
