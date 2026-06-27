@@ -1,6 +1,6 @@
-# AutoBot — Automotive AI Agent
+# ChefAI — Meal Prep Agent
 
-A React + Vite **AI agent** (not just a chatbot) powered by Claude Sonnet 4.6. AutoBot has real tools for web search, web fetch, vehicle comparison, payment calculation, and maintenance schedules.
+A React + Vite **AI agent** meal prep planner powered by Claude Sonnet 4.6. Users complete onboarding, receive a personalized 7-day meal plan, then chat with ChefAI — an agent with **web search** and **web fetch** tools.
 
 ## Getting Started
 
@@ -11,60 +11,51 @@ npm run dev
 
 Open http://localhost:5173 and enter your Anthropic API key when prompted.
 
-## Build for Production
+## App Flow
 
-```bash
-npm run build
-```
+1. **API Key Gate** — Enter `sk-ant-` key (React state only, never persisted)
+2. **Onboarding** — 7-step dietary profile setup
+3. **Meal Plan** — Auto-generated via direct API call
+4. **Chat Agent** — Tool-calling loop with `web_search` and `web_fetch`
 
-Serve the `dist/` folder with any static host (Netlify, Vercel, GitHub Pages, etc).
+## Agent vs Chatbot
 
-## Project Structure
+| Chatbot | Agent (chat) |
+|---------|--------------|
+| System prompt only | System prompt + tools |
+| Single API call | Multi-step agent loop |
+| Training data only | Can search web and fetch recipe pages |
+
+## File Structure
 
 ```
 src/
   agent/
-    agentPrompt.js          — Agent system prompt (personality + tool instructions)
-    runAgent.js             — Agent loop with Anthropic tool-calling
+    agentPrompt.js       — Agent personality + tool instructions
+    runAgent.js          — Agent loop (tool-calling)
     tools/
-      webSearch.js          — Search the web for current automotive info
-      webFetch.js           — Fetch and read a URL
-      compareVehicles.js    — Side-by-side vehicle spec comparison
-      estimateCarPayment.js — Monthly loan payment calculator
-      getMaintenanceSchedule.js — Maintenance intervals by type & mileage
-      index.js              — Tool registry
-  App.jsx                   — Root, manages API key state and active view
+      webSearch.js       — Web search tool
+      webFetch.js        — Web fetch tool
+      proxyFetch.js      — CORS proxy helper
+      index.js           — Tool registry
+  api/
+    claude.js            — Direct API (meal plan generation only)
+  prompts.js             — Profile formatting + buildAgentSystem()
   components/
-    KeyGate.jsx             — API key entry screen
-    Header.jsx              — Top bar with navigation
-    ChatView.jsx            — Chat UI (uses agent loop)
-    HowItWorks.jsx          — Explainer page
-  index.css                 — Global CSS variables and keyframes
-.cursor/rules/
-  autobot-agent.mdc         — Cursor rule for agent development
+    ChatView.jsx         — Agent chat with tool activity UI
+    MealPlan.jsx
+    Onboarding.jsx
+    KeyGate.jsx
+    Header.jsx
 ```
-
-## Agent vs Chatbot
-
-| Chatbot (before) | Agent (now) |
-|---|---|
-| System prompt only | System prompt + tools |
-| Single API call | Multi-step agent loop |
-| Knowledge from training data | Can search web, fetch pages, run calculations |
-| No actions | Calls tools, synthesizes results |
 
 ## Tools
 
-- **web_search** — DuckDuckGo search for current prices, news, recalls
-- **web_fetch** — Read content from any URL
-- **compare_vehicles** — Compare specs for 18+ popular models
-- **estimate_car_payment** — Loan payment calculator
-- **get_maintenance_schedule** — Service intervals for sedan, SUV, truck, sports, EV
+- **web_search** — DuckDuckGo search for recipes, nutrition, techniques
+- **web_fetch** — Read content from recipe blog URLs
 
 ## Notes
 
-- Your API key lives only in React state — it's never stored or hardcoded.
-- Conversation history resets on page refresh.
-- Uses `anthropic-dangerous-direct-browser-access: true` header for direct browser API calls.
-- Web tools use a local Vite dev proxy (`/api/search`, `/api/fetch`) during development, with public proxy fallbacks for production builds.
-- Genre: **Automotive** — all tools and prompts stay in the car domain.
+- No backend, no database, no localStorage
+- Web tools use Vite dev proxy (`/api/search`, `/api/fetch`) in development
+- Uses `anthropic-dangerous-direct-browser-access: true` for browser-direct calls

@@ -1,0 +1,65 @@
+---
+description: ChefAI meal prep agent — convert chatbots to agents with web search and fetch tools
+alwaysApply: true
+---
+
+# ChefAI — Culinary AI Agent
+
+This project is a **culinary meal prep agent** (genre: cooking). When extending or modifying this codebase, stay within the culinary domain. Do not change the genre.
+
+## Architecture
+
+ChefAI is an AI **agent**, not a plain system-prompt chatbot. The chat uses an agent loop in `src/agent/runAgent.js` that calls Claude with tool definitions, executes tool calls in a loop, and returns the final answer.
+
+```
+API Key Gate → Onboarding → Meal Plan (direct API) → Chat Agent (tool-calling loop)
+```
+
+Meal plan generation uses a direct API call (`src/api/claude.js`). Chat uses the agent loop with tools.
+
+```
+User message → runAgent() → Claude (with tools + profile context) → tool_use? → execute tools → loop → final text
+```
+
+## Key Files
+
+- `src/agent/agentPrompt.js` — Base agent personality + tool usage instructions
+- `src/agent/runAgent.js` — Agent loop with Anthropic tool-calling API
+- `src/agent/tools/` — Tool definitions and executors
+- `src/prompts.js` — `buildAgentSystem()` merges profile + meal plan into system prompt
+- `src/components/ChatView.jsx` — Chat UI (uses `runAgent`, shows tool activity)
+- `src/components/MealPlan.jsx` — Direct API call for 7-day plan (not agent)
+
+## Tools (Culinary Genre)
+
+| Tool | Purpose |
+|------|---------|
+| `web_search` | Search the web for recipes, techniques, nutrition info, food trends |
+| `web_fetch` | Fetch and read a specific recipe or food blog URL |
+
+## Adding a New Tool
+
+1. Create `src/agent/tools/yourTool.js` with `definition` and `execute` exports
+2. Register it in `src/agent/tools/index.js`
+3. Add a label in `TOOL_LABELS`
+4. Document the tool in `src/agent/agentPrompt.js`
+5. Keep it culinary-themed — no off-genre tools
+
+## Converting Chatbot → Agent Checklist
+
+- [x] Move system prompt to `agentPrompt.js`, add tool usage instructions
+- [x] Create genre-specific tools in `src/agent/tools/` (web_search, web_fetch)
+- [x] Implement agent loop with tool-calling in `runAgent.js`
+- [x] Update ChatView to use `runAgent()` instead of direct API calls
+- [x] Show tool activity in the UI (tool call cards while agent works)
+- [x] Inject profile + meal plan into system prompt on every agent call
+
+## Conventions
+
+- Tools export `{ definition, execute }` — definition matches Anthropic tool schema
+- Tool results are JSON-stringified before sending back to Claude
+- Max 10 agent loop iterations to prevent runaway tool calls
+- Browser-only: no backend; web tools use CORS proxies (Vite dev proxy + public fallbacks)
+- Model: `claude-sonnet-4-6`
+- API key in React state only — never persisted
+- Light warm cream theme (`#faf6f0`) with terracotta accent (`#c45c3e`)

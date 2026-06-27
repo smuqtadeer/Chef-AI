@@ -19,11 +19,11 @@ export default function KeyGate({ onUnlock }) {
     <div style={styles.overlay}>
       <div style={styles.card}>
         <div style={styles.logoRow}>
-          <div style={styles.logoIcon}>🏎️</div>
-          <h2 style={styles.logoText}>AUTO<span style={{ color: 'var(--red)' }}>BOT</span></h2>
+          <div style={styles.logoIcon}>🍳</div>
+          <h2 style={styles.logoText}>CHEF<span style={{ color: 'var(--accent)' }}>AI</span></h2>
         </div>
         <p style={styles.desc}>
-          Enter your Anthropic API key to start the engine. Your key stays in memory
+          Enter your Anthropic API key to fire up the kitchen. Your key stays in memory
           and is never stored anywhere — it's sent only directly to Anthropic.
         </p>
         <span style={styles.label}>ANTHROPIC API KEY</span>
@@ -69,16 +69,17 @@ const styles = {
     zIndex: 100, padding: 24,
   },
   card: {
-    background: 'var(--dark)',
+    background: 'var(--surface)',
     border: '1px solid var(--border)',
-    borderTop: '3px solid var(--red)',
+    borderTop: '3px solid var(--accent)',
     borderRadius: 14,
     padding: '36px 32px',
     maxWidth: 460, width: '100%',
+    boxShadow: 'var(--shadow-soft)',
   },
   logoRow: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 },
   logoIcon: {
-    width: 42, height: 42, background: 'var(--red)', borderRadius: 6,
+    width: 42, height: 42, background: 'var(--accent)', borderRadius: 8,
     display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
   },
   logoText: {
@@ -104,12 +105,12 @@ const styles = {
     flexShrink: 0,
   },
   unlockBtn: {
-    background: 'var(--red)', border: 'none', borderRadius: 8,
+    background: 'var(--accent)', border: 'none', borderRadius: 8,
     color: '#fff', fontFamily: "'Inter', sans-serif",
     fontWeight: 600, fontSize: 13,
     padding: '11px 18px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
   },
-  error: { fontSize: 12, color: 'var(--red)', marginBottom: 4, minHeight: 18 },
-  hint: { fontSize: 11, color: '#444', marginTop: 14 },
-  link: { color: '#666', textDecoration: 'none' },
+  error: { fontSize: 12, color: 'var(--error)', marginBottom: 4, minHeight: 18 },
+  hint: { fontSize: 11, color: 'var(--text-muted)', marginTop: 14 },
+  link: { color: 'var(--accent)', textDecoration: 'none' },
 }

@@ -3,13 +3,13 @@ import { fetchViaProxy } from './proxyFetch.js'
 export const definition = {
   name: 'web_fetch',
   description:
-    'Fetch and read the text content of a web page URL. Use for reading car reviews, spec sheets, dealer listings, or automotive articles when you have a specific URL.',
+    'Fetch and read the text content of a web page URL. Use for reading recipes, cooking blogs, food articles, or technique guides when you have a specific URL.',
   input_schema: {
     type: 'object',
     properties: {
       url: {
         type: 'string',
-        description: 'The full URL to fetch, e.g. "https://www.caranddriver.com/reviews/..."',
+        description: 'The full URL to fetch, e.g. "https://www.seriouseats.com/recipes/..."',
       },
     },
     required: ['url'],

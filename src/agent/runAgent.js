@@ -1,4 +1,3 @@
-import { AGENT_PROMPT } from './agentPrompt.js'
 import { TOOL_DEFINITIONS, executeTool } from './tools/index.js'
 
 const API_URL = 'https://api.anthropic.com/v1/messages'
@@ -14,7 +13,7 @@ function extractText(content) {
     .join('\n')
 }
 
-async function callClaude(apiKey, messages) {
+async function callClaude(apiKey, messages, system) {
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -26,7 +25,7 @@ async function callClaude(apiKey, messages) {
     body: JSON.stringify({
       model: MODEL,
       max_tokens: MAX_TOKENS,
-      system: AGENT_PROMPT,
+      system,
       tools: TOOL_DEFINITIONS,
       messages,
     }),
@@ -42,14 +41,16 @@ async function callClaude(apiKey, messages) {
   return data
 }
 
-export async function runAgent(apiKey, userMessages, { onToolStart, onToolComplete } = {}) {
+export async function runAgent(apiKey, userMessages, { system, onToolStart, onToolComplete } = {}) {
+  if (!system) throw new Error('Agent system prompt is required')
+
   const messages = [...userMessages]
 
   for (let i = 0; i < MAX_ITERATIONS; i++) {
-    const data = await callClaude(apiKey, messages)
+    const data = await callClaude(apiKey, messages, system)
 
     if (data.stop_reason === 'end_turn' || data.stop_reason === 'max_tokens') {
-      return extractText(data.content) || "Hmm, I stalled out there. Try again!"
+      return extractText(data.content) || "Hmm, I lost my train of thought. Try again!"
     }
 
     if (data.stop_reason === 'tool_use') {
@@ -73,8 +74,8 @@ export async function runAgent(apiKey, userMessages, { onToolStart, onToolComple
       continue
     }
 
-    return extractText(data.content) || "Hmm, I stalled out there. Try again!"
+    return extractText(data.content) || "Hmm, I lost my train of thought. Try again!"
   }
 
-  return "I hit the pit lane — too many tool calls. Try a simpler question!"
+  return "Too many steps in the kitchen — try a simpler question!"
 }

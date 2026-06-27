@@ -3,13 +3,13 @@ import { searchHtml } from './proxyFetch.js'
 export const definition = {
   name: 'web_search',
   description:
-    'Search the web for current automotive information — prices, reviews, news, recalls, specs, or any time-sensitive car data. Use when you need up-to-date info beyond your training data.',
+    'Search the web for current culinary information — recipes, cooking techniques, food trends, ingredient info, or any time-sensitive food data. Use when you need up-to-date info beyond your training data.',
   input_schema: {
     type: 'object',
     properties: {
       query: {
         type: 'string',
-        description: 'The search query, e.g. "2025 Toyota Camry MSRP" or "Tesla Model 3 recall 2025"',
+        description: 'The search query, e.g. "easy chicken tikka masala recipe" or "vegan egg substitutes baking"',
       },
     },
     required: ['query'],
