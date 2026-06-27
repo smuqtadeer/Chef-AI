@@ -321,8 +321,8 @@ const s = {
   },
   logoIcon: { fontSize: 26 },
   logoText: {
-    fontFamily: "'Bebas Neue', sans-serif",
-    fontSize: 28, letterSpacing: 1.5, color: 'var(--text)',
+    fontFamily: "'Inter', sans-serif",
+    fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px', color: 'var(--text)',
   },
   progressBar: {
     height: 4, background: 'var(--border)', borderRadius: 2,
@@ -342,8 +342,8 @@ const s = {
     animation: 'slideIn .3s ease', boxShadow: 'var(--shadow)',
   },
   title: {
-    fontFamily: "'Bebas Neue', sans-serif",
-    fontSize: 26, letterSpacing: 1, marginBottom: 6,
+    fontFamily: "'Inter', sans-serif",
+    fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px', marginBottom: 6,
   },
   subtitle: { fontSize: 13, color: 'var(--text-muted)', marginBottom: 20, lineHeight: 1.6 },
   options: { display: 'flex', flexDirection: 'column', gap: 8 },

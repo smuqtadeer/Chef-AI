@@ -229,8 +229,8 @@ const s = {
   container: { maxWidth: 600, margin: '0 auto' },
   header: { marginBottom: 24 },
   title: {
-    fontFamily: "'Bebas Neue', sans-serif",
-    fontSize: 28, letterSpacing: 1.5, marginBottom: 6,
+    fontFamily: "'Inter', sans-serif",
+    fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px', marginBottom: 6,
   },
   sub: { fontSize: 13, color: 'var(--text-muted)' },
 

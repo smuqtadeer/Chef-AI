@@ -255,8 +255,8 @@ const s = {
   },
   emptyIcon: { fontSize: 48, marginBottom: 14 },
   emptyTitle: {
-    fontFamily: "'Bebas Neue', sans-serif", fontSize: 34,
-    letterSpacing: 1.5, marginBottom: 8,
+    fontFamily: "'Inter', sans-serif", fontSize: 28,
+    fontWeight: 800, letterSpacing: '-0.5px', marginBottom: 8,
   },
   emptySub: { fontSize: 14, color: 'var(--text-muted)', marginBottom: 28 },
   chips: { display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', maxWidth: 560 },

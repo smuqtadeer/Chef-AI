@@ -20,14 +20,14 @@ export default function KeyGate({ onUnlock }) {
       <div style={styles.card}>
         <div style={styles.logoRow}>
           <div style={styles.logoIcon}>🍳</div>
-          <h2 style={styles.logoText}>CHEF<span style={{ color: 'var(--accent)' }}>AI</span></h2>
+          <h2 style={styles.logoText}>Chef<span style={{ color: '#60a5fa' }}>AI</span></h2>
         </div>
         <p style={styles.desc}>
-          Enter your Anthropic API key to fire up the kitchen. Your key stays in memory
+          Enter your Anthropic API key to get started. Your key stays in memory
           and is never stored anywhere — it's sent only directly to Anthropic.
         </p>
         <span style={styles.label}>ANTHROPIC API KEY</span>
-        <div style={styles.inputRow}>
+        <div style={styles.inputWrap}>
           <input
             type={showKey ? 'text' : 'password'}
             value={key}
@@ -45,11 +45,11 @@ export default function KeyGate({ onUnlock }) {
           >
             {showKey ? '🙈' : '👁️'}
           </button>
-          <button onClick={handleUnlock} style={styles.unlockBtn}>
-            Start →
-          </button>
         </div>
         {error && <p style={styles.error}>{error}</p>}
+        <button onClick={handleUnlock} style={styles.unlockBtn}>
+          Get Started
+        </button>
         <p style={styles.hint}>
           Don't have a key?{' '}
           <a href="https://console.anthropic.com" target="_blank" rel="noreferrer" style={styles.link}>
@@ -64,53 +64,55 @@ export default function KeyGate({ onUnlock }) {
 const styles = {
   overlay: {
     position: 'fixed', inset: 0,
-    background: 'var(--black)',
+    background: '#f8f5f0',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     zIndex: 100, padding: 24,
   },
   card: {
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderTop: '3px solid var(--accent)',
-    borderRadius: 14,
-    padding: '36px 32px',
-    maxWidth: 460, width: '100%',
-    boxShadow: 'var(--shadow-soft)',
+    background: '#ffffff',
+    border: '1px solid #e8e4de',
+    borderRadius: 16,
+    padding: '40px 36px',
+    maxWidth: 440, width: '100%',
+    boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
   },
-  logoRow: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 },
+  logoRow: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 },
   logoIcon: {
-    width: 42, height: 42, background: 'var(--accent)', borderRadius: 8,
-    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
+    width: 40, height: 40, background: '#eff6ff',
+    border: '1.5px solid #60a5fa',
+    borderRadius: 10,
+    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
   },
   logoText: {
-    fontFamily: "'Bebas Neue', sans-serif",
-    fontSize: 30, letterSpacing: 2, color: 'var(--white)',
+    fontFamily: "'Inter', sans-serif",
+    fontSize: 24, fontWeight: 700, color: '#1c1917',
   },
-  desc: { fontSize: 13, color: 'var(--gray)', marginBottom: 20, lineHeight: 1.65 },
+  desc: { fontSize: 13, color: '#78716c', marginBottom: 24, lineHeight: 1.65 },
   label: {
-    display: 'block', fontSize: 11, fontWeight: 600,
-    letterSpacing: 1.5, color: 'var(--gray)', marginBottom: 8,
+    display: 'block', fontSize: 11, fontWeight: 700,
+    letterSpacing: 1.5, color: '#a8a29e', marginBottom: 8,
+    textTransform: 'uppercase',
   },
-  inputRow: { display: 'flex', gap: 8, marginBottom: 8 },
+  inputWrap: { position: 'relative', marginBottom: 8 },
   input: {
-    flex: 1, background: 'var(--panel)', border: '1px solid var(--border)',
-    borderRadius: 8, color: 'var(--white)',
+    width: '100%', background: '#ffffff', border: '1px solid #e8e4de',
+    borderRadius: 10, color: '#1c1917',
     fontFamily: "'Inter', sans-serif", fontSize: 13,
-    padding: '11px 14px', outline: 'none', letterSpacing: 0.5,
-    minWidth: 0,
+    padding: '11px 44px 11px 14px', outline: 'none', letterSpacing: 0.5,
+    boxSizing: 'border-box',
   },
   eyeBtn: {
-    background: 'var(--panel)', border: '1px solid var(--border)',
-    borderRadius: 8, cursor: 'pointer', padding: '0 12px', fontSize: 16,
-    flexShrink: 0,
+    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+    background: 'none', border: 'none', cursor: 'pointer', fontSize: 16,
+    padding: '2px 4px', lineHeight: 1,
   },
   unlockBtn: {
-    background: 'var(--accent)', border: 'none', borderRadius: 8,
+    width: '100%', background: '#60a5fa', border: 'none', borderRadius: 10,
     color: '#fff', fontFamily: "'Inter', sans-serif",
-    fontWeight: 600, fontSize: 13,
-    padding: '11px 18px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+    fontWeight: 600, fontSize: 14,
+    padding: '13px 18px', cursor: 'pointer', marginBottom: 16,
   },
-  error: { fontSize: 12, color: 'var(--error)', marginBottom: 4, minHeight: 18 },
-  hint: { fontSize: 11, color: 'var(--text-muted)', marginTop: 14 },
-  link: { color: 'var(--accent)', textDecoration: 'none' },
+  error: { fontSize: 12, color: '#dc2626', marginBottom: 12, minHeight: 18 },
+  hint: { fontSize: 12, color: '#a8a29e', textAlign: 'center' },
+  link: { color: '#60a5fa', textDecoration: 'none' },
 }

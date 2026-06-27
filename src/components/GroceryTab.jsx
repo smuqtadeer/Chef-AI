@@ -163,8 +163,8 @@ const s = {
   },
   emptyIcon: { fontSize: 52, marginBottom: 16 },
   emptyTitle: {
-    fontFamily: "'Bebas Neue', sans-serif", fontSize: 30,
-    letterSpacing: 1.5, marginBottom: 10,
+    fontFamily: "'Inter', sans-serif", fontSize: 24,
+    fontWeight: 800, letterSpacing: '-0.3px', marginBottom: 10,
   },
   emptySub: { fontSize: 14, color: 'var(--text-muted)', maxWidth: 380, lineHeight: 1.6, marginBottom: 24 },
   emptyBtn: {
@@ -184,7 +184,7 @@ const s = {
     display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 16,
   },
   colTitle: {
-    fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, letterSpacing: 1,
+    fontFamily: "'Inter', sans-serif", fontSize: 18, fontWeight: 700, letterSpacing: '-0.2px',
   },
   progress: { fontSize: 12, fontWeight: 600 },
   grid: { display: 'flex', flexDirection: 'column', gap: 12 },

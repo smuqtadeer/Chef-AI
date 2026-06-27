@@ -143,9 +143,9 @@ const styles = {
     marginBottom: 6,
   },
   dayTitle: {
-    fontFamily: "'Bebas Neue', sans-serif",
-    fontSize: 34,
-    letterSpacing: 1.5,
+    fontFamily: "'Inter', sans-serif",
+    fontSize: 28, fontWeight: 800,
+    letterSpacing: '-0.5px',
     color: 'var(--text)',
     lineHeight: 1.1,
     marginBottom: 6,
@@ -214,8 +214,8 @@ const styles = {
     animation: 'spin 1s linear infinite',
   },
   loadingTitle: {
-    fontFamily: "'Bebas Neue', sans-serif",
-    fontSize: 24, letterSpacing: 1, marginBottom: 8, color: 'var(--text)',
+    fontFamily: "'Inter', sans-serif",
+    fontSize: 20, fontWeight: 700, letterSpacing: '-0.2px', marginBottom: 8, color: 'var(--text)',
   },
   loadingText: {
     fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: 320, margin: '0 auto',
