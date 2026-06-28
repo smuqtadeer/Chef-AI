@@ -67,4 +67,15 @@ function proxyPlugin() {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), proxyPlugin()],
+  server: {
+    port: 5181,
+    proxy: {
+      '/api/rag': {
+        target: 'http://127.0.0.1:5280',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/rag/, '/api'),
+        timeout: 300_000,
+      },
+    },
+  },
 })

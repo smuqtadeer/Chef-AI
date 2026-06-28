@@ -1,0 +1,6 @@
+@ChefAI.RagApi_HostAddress = http://localhost:5048
+
+GET {{ChefAI.RagApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

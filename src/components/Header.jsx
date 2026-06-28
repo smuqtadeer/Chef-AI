@@ -2,6 +2,7 @@ export default function Header({ activeTab, onTab, groceryBadge }) {
   const tabs = [
     { id: 'chat',     label: 'Discover' },
     { id: 'mealprep', label: 'Meal Prep' },
+    { id: 'knowledge', label: 'Knowledge Base' },
     { id: 'grocery',  label: 'Grocery' },
   ]
 

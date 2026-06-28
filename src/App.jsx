@@ -4,6 +4,7 @@ import Header from './components/Header'
 import ChatTab from './components/ChatTab'
 import MealPrepTab from './components/MealPrepTab'
 import GroceryTab from './components/GroceryTab'
+import KnowledgeBaseTab from './components/KnowledgeBaseTab'
 
 // ── meal-plan parsing ────────────────────────────────────────────────────────
 
@@ -136,6 +137,9 @@ export default function App() {
             completedDays={completedDays}
             onToggleDay={toggleDay}
           />
+        )}
+        {activeTab === 'knowledge' && (
+          <KnowledgeBaseTab />
         )}
         {activeTab === 'grocery' && (
           <GroceryTab

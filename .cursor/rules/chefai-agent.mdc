@@ -1,5 +1,5 @@
 ---
-description: ChefAI meal prep agent — convert chatbots to agents with web search and fetch tools
+description: ChefAI meal prep agent — RAG backend, web search, and fetch tools
 alwaysApply: true
 ---
 
@@ -9,57 +9,36 @@ This project is a **culinary meal prep agent** (genre: cooking). When extending 
 
 ## Architecture
 
-ChefAI is an AI **agent**, not a plain system-prompt chatbot. The chat uses an agent loop in `src/agent/runAgent.js` that calls Claude with tool definitions, executes tool calls in a loop, and returns the final answer.
-
 ```
-API Key Gate → Onboarding → Meal Plan (direct API) → Chat Agent (tool-calling loop)
+API Key Gate → Onboarding → Meal Plan (direct API) → Knowledge Base (RAG upload) → Chat Agent
 ```
 
-Meal plan generation uses a direct API call (`src/api/claude.js`). Chat uses the agent loop with tools.
-
-```
-User message → runAgent() → Claude (with tools + profile context) → tool_use? → execute tools → loop → final text
-```
-
-## Key Files
-
-- `src/agent/agentPrompt.js` — Base agent personality + tool usage instructions
-- `src/agent/runAgent.js` — Agent loop with Anthropic tool-calling API
-- `src/agent/tools/` — Tool definitions and executors
-- `src/prompts.js` — `buildAgentSystem()` merges profile + meal plan into system prompt
-- `src/components/ChatView.jsx` — Chat UI (uses `runAgent`, shows tool activity)
-- `src/components/MealPlan.jsx` — Direct API call for 7-day plan (not agent)
+Chat uses an agent loop in `src/agent/runAgent.js`. Meal plans use direct API (`src/api/claude.js`). Document ingestion uses the .NET RAG API (`backend/ChefAI.RagApi`).
 
 ## Tools (Culinary Genre)
 
 | Tool | Purpose |
 |------|---------|
-| `web_search` | Search the web for recipes, techniques, nutrition info, food trends |
-| `web_fetch` | Fetch and read a specific recipe or food blog URL |
+| `search_knowledge` | Vector search uploaded recipe docs (call FIRST) |
+| `web_search` | Web search when knowledge base lacks answers |
+| `web_fetch` | Fetch a specific recipe or food blog URL |
+
+## RAG Backend
+
+- .NET 10 API on `http://127.0.0.1:5280`
+- PostgreSQL + pgvector database `chefai_rag`
+- OpenRouter `openai/text-embedding-3-large` (1536 dims) — **server-side only**
+- Secrets via User Secrets or env vars — **never in git or React state**
 
 ## Adding a New Tool
 
-1. Create `src/agent/tools/yourTool.js` with `definition` and `execute` exports
-2. Register it in `src/agent/tools/index.js`
-3. Add a label in `TOOL_LABELS`
-4. Document the tool in `src/agent/agentPrompt.js`
-5. Keep it culinary-themed — no off-genre tools
-
-## Converting Chatbot → Agent Checklist
-
-- [x] Move system prompt to `agentPrompt.js`, add tool usage instructions
-- [x] Create genre-specific tools in `src/agent/tools/` (web_search, web_fetch)
-- [x] Implement agent loop with tool-calling in `runAgent.js`
-- [x] Update ChatView to use `runAgent()` instead of direct API calls
-- [x] Show tool activity in the UI (tool call cards while agent works)
-- [x] Inject profile + meal plan into system prompt on every agent call
+1. Create `src/agent/tools/yourTool.js` with `definition` and `execute`
+2. Register in `src/agent/tools/index.js`
+3. Document in `src/agent/agentPrompt.js`
 
 ## Conventions
 
-- Tools export `{ definition, execute }` — definition matches Anthropic tool schema
-- Tool results are JSON-stringified before sending back to Claude
-- Max 10 agent loop iterations to prevent runaway tool calls
-- Browser-only: no backend; web tools use CORS proxies (Vite dev proxy + public fallbacks)
+- Anthropic key: React state only, browser → Anthropic
+- OpenRouter + Postgres passwords: backend User Secrets / env only
+- Max 10 agent loop iterations
 - Model: `claude-sonnet-4-6`
-- API key in React state only — never persisted
-- Light warm cream theme (`#faf6f0`) with terracotta accent (`#c45c3e`)
